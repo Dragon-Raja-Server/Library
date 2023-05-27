@@ -1,0 +1,34 @@
+암호부 초기화 예제
+
+CHSEL En;
+CHSEL::INIT_INFO DeInfo ={0,};
+DWORD dwInitFlag =	CHSEL::ENCRYPT_SECURE	//안전 중시
+		|	CHSEL::SWAP_ON			//데이터 스와핑
+		|	CHSEL::KEY_INIT_AUTO	//라이브러리가 키 생성
+		|	CHSEL::KEY_ROLL_DYNAMIC;//1회 Encrypt시 암호화 키 변경
+
+//암호부 초기화 
+const CHSEL::eRESULT_CODE RetEN = En.Init(dwInitFlag);
+if(CHSEL::INIT_SUCCESS == RetEN)//암호부 초기화 성공
+{//else는 실패, Init 의 리턴값을 참조 할 것
+En.GetInitInfo(DeInfo);//복호부에 전달할 메뉴얼 데이터 얻기.
+}
+
+복호부 초기화 예제
+
+// DeInfo 는 암호부 초기화 때 받아놓은 CHSEL::INIT_INFO 를 사용 할 것
+const CHSEL::eRESULT_CODE RetDE  = De.InitManual(DeInfo);//복호부 초기화
+	
+if(CHSEL::INIT_SUCCESS == RetDE)//암호부 초기화 성공
+{//성공 //else는 실패, Init 의 리턴값을 참조 할 것
+}
+
+실제 암/복호화 예제
+En.Encrypt((char*)pTarget, dwSize);//암호화
+En.GetLastCRC(dwEnCRC);//암호화한 데이터의 CRC 가져오기
+
+De.Decrypt((char*)pTarget, dwSize);//복호화
+De.GetLastCRC(dwDeCRC);//복호화한 데이터의 CRC 기록을 가져오기
+if(dwDeCRC != dwEnCRC)
+{//복호화 실패로 처리 하여 이후 작업을 중단한다.
+}
